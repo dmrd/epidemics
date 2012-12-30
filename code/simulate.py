@@ -19,9 +19,9 @@ import random
 import networkx as nx
 
 #Number monte carlo trials to estimate activation for each node in greedy
-NUMGREEDYTRIALS = 5
+NUMGREEDYTRIALS = 10
 #Number of monte carlo trials for final activation estimate
-NUMOUTPUTTRIALS = 10
+NUMOUTPUTTRIALS = 1000
 
 #Fixed for now
 def infectProb(edge, time):
@@ -29,7 +29,7 @@ def infectProb(edge, time):
 
 #Simulate the spread function
 def monteCarloSpread(G, activeSet):
-    allActive = set()
+    allActive = set(activeSet)
     unchanged = False
     timeStep = 0
     while (not(unchanged)):
@@ -42,6 +42,7 @@ def monteCarloSpread(G, activeSet):
                         unchanged = False
                         nextSet.add(nbr)
                         allActive.add(nbr)
+        timeStep += 1
         activeSet = nextSet
     return len(allActive)
 
@@ -55,7 +56,6 @@ def monteCarloTrials(G, startSet, trials=10000):
 def greedy(G, K):
     currentSet = set()
     for i in range(K):
-        print("Node " + str(i))
         bestNode = None
         bestVal = 0
         for node in G.nodes():
@@ -71,6 +71,7 @@ def greedy(G, K):
             print("No best node - error")
             return set()
         currentSet.add(bestNode)
+        print("Node " + str(i+1) + ": " + str(bestVal))
     return currentSet
     
 #Return the K nodes with the smallest average distance to other nodes in G
