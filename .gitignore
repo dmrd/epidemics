@@ -1,3 +1,5 @@
+datasets/*
+code/ENV
 *.acn
 *.acr
 *.alg
