@@ -1,0 +1,39 @@
+Reading ../datasets/ca-HepTh.txt
+Running simulation with:
+Set size: 	30
+Heuristic: 	greedy
+Nodes: 		9877
+Edges: 		51971
+hello
+Node 1: 1.7376
+	Time: 87.2952029705
+hello
+Node 2: 3.4897
+	Time: 631.599524975
+hello
+Node 3: 5.1685
+	Time: 1252.54014993
+hello
+Node 4: 6.8461
+	Time: 1866.13429499
+hello
+Node 5: 8.464
+	Time: 2363.80094194
+hello
+Node 6: 10.0791
+	Time: 2808.49619412
+hello
+Node 7: 11.6171
+	Time: 3349.87952995
+hello
+Node 8: 13.1947
+	Time: 3909.06648397
+hello
+Node 9: 14.7939
+	Time: 4472.98824286
+hello
+Node 10: 16.3129
+	Time: 5094.4470768
+hello
+Node 11: 17.8584
+	Time: 5696.86370897
