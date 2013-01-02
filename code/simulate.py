@@ -16,22 +16,26 @@
 import sys
 import pickle
 import random
+import time
 import networkx as nx
 
 #Number monte carlo trials to estimate activation for each node in greedy
-NUMGREEDYTRIALS = 10
+NUMGREEDYTRIALS = 100
 #Number of monte carlo trials for final activation estimate
 NUMOUTPUTTRIALS = 1000
 
 #Fixed for now
 def infectProb(edge, time):
-    return 0.1
+    #return 0.1  #-1-
+    return 0.01  #-01-
+    #return 0.1*(1/time) #-1taildown
+    #return 0.1-time*0.01 #-1lineardown
 
 #Simulate the spread function
 def monteCarloSpread(G, activeSet):
     allActive = set(activeSet)
     unchanged = False
-    timeStep = 0
+    timeStep = 1
     while (not(unchanged)):
         unchanged = True
         nextSet = set()
@@ -47,31 +51,39 @@ def monteCarloSpread(G, activeSet):
     return len(allActive)
 
 def monteCarloTrials(G, startSet, trials=10000):
-    total = 0
+    total = 0.0
     for i in range(trials):
         #print(i)
         total += monteCarloSpread(G, startSet)
     return (total / trials)
 
+
+
+
 def greedy(G, K):
-    currentSet = set()
+    #Use a list so we can get the order they were added
+    currentSet = []
     for i in range(K):
+        timeStart = time.time()
         bestNode = None
         bestVal = 0
         for node in G.nodes():
             if node in currentSet:
                 continue
-            currentSet.add(node)
+            currentSet.append(node)
             active = monteCarloTrials(G, currentSet, NUMGREEDYTRIALS)
-            currentSet.remove(node)
+            currentSet.pop()
             if (active > bestVal):
                 bestVal = active
                 bestNode = node
         if (bestNode == None):
             print("No best node - error")
             return set()
-        currentSet.add(bestNode)
+        currentSet.append(bestNode)
+        timeEnd = time.time()
         print("Node " + str(i+1) + ": " + str(bestVal))
+        print("\tTime: " + str(timeEnd-timeStart))
+        sys.stdout.flush()
     return currentSet
     
 #Return the K nodes with the smallest average distance to other nodes in G
@@ -94,14 +106,14 @@ def centrality(G, K):
         pickle.dump(degSorted,toSave,-1)
         toSave.close()
         #Return set of nodes - strip degree count (degSorted is list of tuples)
-        return set(degSorted[:K])
+        return degSorted[:K]
 
 #Return the K nodes with the highest degree in G
 def degree(G, K):
     #Sort nodes by degree
     degSorted = sorted(nx.degree_centrality(G).items(), key=lambda x: x[1])
     #Return set of nodes - strip degree count (degSorted is list of tuples)
-    return set([n[0] for n in degSorted[:-K-1:-1]])
+    return [n[0] for n in degSorted[:-K-1:-1]]
 
 
 #Returns a set of K randomly chosen nodes from G
@@ -124,7 +136,7 @@ def simulate(G):
         return -1
 
     print("Estimating activation function...")
-    #print(S)
+    print(S)
     print(monteCarloTrials(G, S, NUMOUTPUTTRIALS))
 
 
