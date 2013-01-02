@@ -17,19 +17,43 @@ import sys
 import pickle
 import random
 import time
+import decimal
 import networkx as nx
 
 #Number monte carlo trials to estimate activation for each node in greedy
 NUMGREEDYTRIALS = 100
 #Number of monte carlo trials for final activation estimate
 NUMOUTPUTTRIALS = 1000
+#Amount of change each round for each edge
+DELTA = 0.1
+#How far to move in sin curve each time step
+SINDELTA = math.pi/2
 
-#Fixed for now
-def infectProb(edge, time):
-    #return 0.1  #-1-
-    return 0.01  #-01-
-    #return 0.1*(1/time) #-1taildown
-    #return 0.1-time*0.01 #-1lineardown
+#What is the current probability for the edge at the given time?
+def infectProb(edge, time, G):
+    edgeObj = G[edge[0]][edge[1]]
+    if ('lastUpdateTime' in edgeObj):
+        if (len(sys.argv) < 5 || (sys.argv[4] != 'add' && sys.argv[4] != 'sin')): 
+            edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] *
+                (time - edgeObj['lastUpdateTime'])) * edgeObj['probability']
+        else if (sys.argv[4] == 'add'):
+            edgeObj['probability'] = DELTA * edgeObj['direction'] *
+                (time - edgeObj['lastUpdateTime']) + edgeObj['probability']
+        else:
+            edgeObj['probability'] = math.sin(edgeObj['sinStart'] + time*SINDELTA)
+        if (edgeObj['probability'] > 1):
+            edgeObj['probability'] = 1
+        if (edgeObj['probability'] < 0):
+            edgeObj['probability'] = 0
+        return edgeObj['probability']
+    else:
+        edgeObj['probability'] = random.uniform(0, 1)
+        edgeObj['direction'] = -2 * random,randint(0, 1) + 1
+        edgeObj['lastUpdateTime'] = 0
+        edgeObj['sinStart'] = random.uniform(0, 2*math.pi)
+        return infectProb(edge, time, G)
+
+#def sinProbj
 
 #Simulate the spread function
 def monteCarloSpread(G, activeSet):
@@ -42,7 +66,7 @@ def monteCarloSpread(G, activeSet):
         for node in activeSet:
             for nbr in G[node]:
                 if nbr not in allActive:
-                    if (random.random() < infectProb((node,nbr), timeStep)):
+                    if (random.random() < infectProb((node,nbr), timeStep), G):
                         unchanged = False
                         nextSet.add(nbr)
                         allActive.add(nbr)
@@ -56,8 +80,6 @@ def monteCarloTrials(G, startSet, trials=10000):
         #print(i)
         total += monteCarloSpread(G, startSet)
     return (total / trials)
-
-
 
 
 def greedy(G, K):
