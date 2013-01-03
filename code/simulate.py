@@ -35,7 +35,7 @@ SEEDED = False
 #initialize the edge 
 def edgeInit(edgeObj):
     edgeObj['probability'] = random.uniform(0, 1)
-    edgeObj['direction'] = -2 * random,randint(0, 1) + 1
+    edgeObj['direction'] = -2 * random.randint(0, 1) + 1
     edgeObj['lastUpdateTime'] = 0
     edgeObj['sinStart'] = random.uniform(0, 2*math.pi)
 
@@ -71,7 +71,7 @@ def monteCarloSpread(G, activeSet):
         for node in activeSet:
             for nbr in G[node]:
                 if nbr not in allActive:
-                    if (random.random() < infectProb((node,nbr), timeStep), G):
+                    if (random.random() < infectProb((node,nbr), timeStep, G)):
                         unchanged = False
                         nextSet.add(nbr)
                         allActive.add(nbr)
@@ -151,14 +151,12 @@ def simulate(G):
     K = int(sys.argv[3]) #Set size
     alg = sys.argv[2] #Heuristic
     #try to seed the if random number generator if the seed has been specified
-    if (not SEEDED):
-        SEEDED = True
-        if (len(sys.argv) >= 6):
-            random.seed(int(sys.argv[5]))
+    if (len(sys.argv) >= 6):
+        random.seed(int(sys.argv[5]))
     #initialize all nodes
     for node in G.nodes():
         for nbr in G[node]:
-            edgeObj = G[edge[0]][edge[1]]
+            edgeObj = G[node][nbr]
             #initialize the edge if it doesn't have all the desired fields
             if ('lastUpdateTime' not in edgeObj):
                 edgeInit(edgeObj)
