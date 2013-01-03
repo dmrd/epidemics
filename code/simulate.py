@@ -13,6 +13,7 @@
 #
 # This one (or similar) is used in the original paper (also good to test on)
 # http://snap.stanford.edu/data/ca-HepTh.html
+import math
 import sys
 import pickle
 import random
@@ -33,11 +34,11 @@ SINDELTA = math.pi/2
 def infectProb(edge, time, G):
     edgeObj = G[edge[0]][edge[1]]
     if ('lastUpdateTime' in edgeObj):
-        if (len(sys.argv) < 5 || (sys.argv[4] != 'add' && sys.argv[4] != 'sin')): 
-            edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] *
+        if (len(sys.argv) < 5 or (sys.argv[4] != 'add' and sys.argv[4] != 'sin')): 
+            edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] * \
                 (time - edgeObj['lastUpdateTime'])) * edgeObj['probability']
-        else if (sys.argv[4] == 'add'):
-            edgeObj['probability'] = DELTA * edgeObj['direction'] *
+        elif (sys.argv[4] == 'add'):
+            edgeObj['probability'] = DELTA * edgeObj['direction'] * \
                 (time - edgeObj['lastUpdateTime']) + edgeObj['probability']
         else:
             edgeObj['probability'] = math.sin(edgeObj['sinStart'] + time*SINDELTA)
