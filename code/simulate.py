@@ -13,6 +13,7 @@
 #
 # This one (or similar) is used in the original paper (also good to test on)
 # http://snap.stanford.edu/data/ca-HepTh.html
+import math
 import sys
 import pickle
 import random
@@ -27,49 +28,33 @@ NUMOUTPUTTRIALS = 10000
 #Amount of change each round for each edge
 DELTA = 0.1
 #How far to move in sin curve each time step
-#SINDELTA = math.pi/2
-if (len(sys.argv) >= 5):
-    PROB = int(sys.argv[4])
+SINDELTA = math.pi/2
+
+#initialize the edge 
+def edgeInit(edgeObj):
+    edgeObj['probability'] = random.uniform(0, 1)
+    edgeObj['direction'] = -2 * random.randint(0, 1) + 1
+    edgeObj['lastUpdateTime'] = 0
+    edgeObj['sinStart'] = random.uniform(0, 2*math.pi)
 
 #What is the current probability for the edge at the given time?
-def infectProb(edge, time):
-    if (PROB == 0):
-        return 0.1
-    elif (PROB == 1):
-        return 0.01
-    elif (PROB == 2):
-        return 0.1*(1/time)
-    elif (PROB == 3):
-        return 0.1 - (time * 0.01)
+def infectProb(edge, time, G):
+    edgeObj = G[edge[0]][edge[1]]
+    #three different options for calculating probability change over time
+    if (len(sys.argv) < 5 or (sys.argv[4] != 'linear' and sys.argv[4] != 'sine')): 
+        edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] * \
+            (time - edgeObj['lastUpdateTime'])) * edgeObj['probability']
+    elif (sys.argv[4] == 'linear'):
+        edgeObj['probability'] = DELTA * edgeObj['direction'] * \
+            (time - edgeObj['lastUpdateTime']) + edgeObj['probability']
     else:
-        print("NO PROB SPECIFIED")
-        print(PROB)
-        exit()
-
-#def infectProb(edge, time, G):
-    #edgeObj = G[edge[0]][edge[1]]
-    #if ('lastUpdateTime' in edgeObj):
-        #if (len(sys.argv) < 5 || (sys.argv[4] != 'add' && sys.argv[4] != 'sin')): 
-            #edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] *
-                #(time - edgeObj['lastUpdateTime'])) * edgeObj['probability']
-        #else if (sys.argv[4] == 'add'):
-            #edgeObj['probability'] = DELTA * edgeObj['direction'] *
-                #(time - edgeObj['lastUpdateTime']) + edgeObj['probability']
-        #else:
-            #edgeObj['probability'] = math.sin(edgeObj['sinStart'] + time*SINDELTA)
-        #if (edgeObj['probability'] > 1):
-            #edgeObj['probability'] = 1
-        #if (edgeObj['probability'] < 0):
-            #edgeObj['probability'] = 0
-        #return edgeObj['probability']
-    #else:
-        #edgeObj['probability'] = random.uniform(0, 1)
-        #edgeObj['direction'] = -2 * random,randint(0, 1) + 1
-        #edgeObj['lastUpdateTime'] = 0
-        #edgeObj['sinStart'] = random.uniform(0, 2*math.pi)
-        #return infectProb(edge, time, G)
-
-#def sinProbj
+        edgeObj['probability'] = math.sin(edgeObj['sinStart'] + time*SINDELTA)
+    #fix up so that probabilties don't go haywires too big or small
+    if (edgeObj['probability'] > 1):
+        edgeObj['probability'] = 1
+    if (edgeObj['probability'] < 0):
+        edgeObj['probability'] = 0
+    return edgeObj['probability']
 
 #Simulate the spread function
 def monteCarloSpread(G, activeSet):
@@ -82,7 +67,7 @@ def monteCarloSpread(G, activeSet):
         for node in activeSet:
             for nbr in G[node]:
                 if nbr not in allActive:
-                    if (random.random() < infectProb((node,nbr), timeStep)):
+                    if (random.random() < infectProb((node,nbr), timeStep, G)):
                         unchanged = False
                         nextSet.add(nbr)
                         allActive.add(nbr)
@@ -162,6 +147,16 @@ def randomNodes(G, K):
 def simulate(G):
     K = int(sys.argv[3]) #Set size
     alg = sys.argv[2] #Heuristic
+    #try to seed the if random number generator if the seed has been specified
+    if (len(sys.argv) >= 6):
+        random.seed(int(sys.argv[5]))
+    #initialize all nodes
+    for node in G.nodes():
+        for nbr in G[node]:
+            edgeObj = G[node][nbr]
+            #initialize the edge if it doesn't have all the desired fields
+            if ('lastUpdateTime' not in edgeObj):
+                edgeInit(edgeObj)
     if (alg == "degree"):
         S = degree(G, K)
     elif (alg == "centrality"):
@@ -183,10 +178,10 @@ def simulate(G):
 
 
 def main():
-    if (len(sys.argv) < 5):
-        print("syntax:" + str(sys.argv[0]) + " GraphFile Heuristic SetSize Probability")
+    if (len(sys.argv) < 4):
+        print("syntax:" + str(sys.argv[0]) + " GraphFile Heuristic SetSize ProbabilityAlgorithm Seed")
         print("Heuristics: degree, centrality, greedy, and random")
-        print("Probability: 0: 0.1, 1:0.01, 2: 0.1 * (1/time), 3: 0.1 - (time * 0.01)")
+        print("ProbabilityAlgorithm: tail, linear, and sine")
         return
     else:
         print("Reading " + str(sys.argv[1]))
