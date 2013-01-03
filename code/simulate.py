@@ -42,14 +42,6 @@ def edgeInit(edgeObj):
 #What is the current probability for the edge at the given time?
 def infectProb(edge, time, G):
     edgeObj = G[edge[0]][edge[1]]
-    #initialize the edge if it doesn't have all the desired fields
-    if ('lastUpdateTime' not in edgeObj):
-        edgeInit(edgeObj)
-    #try to seed the if random number generator if the seed has been specified
-    if (not SEEDED):
-        SEEDED = True
-        if (len(sys.argv) >= 6):
-            random.seed(int(sys.argv[5]))
     #three different options for calculating probability change over time
     if (len(sys.argv) < 5 or (sys.argv[4] != 'linear' and sys.argv[4] != 'sine')): 
         edgeObj['probability'] = math.pow(DELTA, edgeObj['direction'] * \
@@ -158,6 +150,18 @@ def randomNodes(G, K):
 def simulate(G):
     K = int(sys.argv[3]) #Set size
     alg = sys.argv[2] #Heuristic
+    #try to seed the if random number generator if the seed has been specified
+    if (not SEEDED):
+        SEEDED = True
+        if (len(sys.argv) >= 6):
+            random.seed(int(sys.argv[5]))
+    #initialize all nodes
+    for node in G.nodes():
+        for nbr in G[node]:
+            edgeObj = G[edge[0]][edge[1]]
+            #initialize the edge if it doesn't have all the desired fields
+            if ('lastUpdateTime' not in edgeObj):
+                edgeInit(edgeObj)
     if (alg == "degree"):
         S = degree(G, K)
     elif (alg == "centrality"):
