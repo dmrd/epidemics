@@ -1,0 +1,69 @@
+Reading ../datasets/ca-GrQc.txt
+Running simulation with:
+Set size: 	30
+Heuristic: 	greedy
+Nodes: 		5242
+Edges: 		28980
+hello
+Node 1: 1072.64
+	Time: 841.048805952
+hello
+Node 2: 1099.53
+	Time: 3811.12890291
+hello
+Node 3: 1124.83
+	Time: 4214.84619904
+hello
+Node 4: 1138.15
+	Time: 6171.72264004
+hello
+Node 5: 1147.12
+	Time: 4348.12158895
+hello
+Node 6: 1154.04
+	Time: 4464.81584597
+hello
+Node 7: 1156.97
+	Time: 4216.06455898
+hello
+Node 8: 1165.42
+	Time: 4214.5920341
+hello
+Node 9: 1177.87
+	Time: 3751.53497505
+hello
+Node 10: 1180.2
+	Time: 3536.62273216
+hello
+Node 11: 1193.04
+	Time: 3558.15220904
+hello
+Node 12: 1192.12
+	Time: 3559.15790319
+hello
+Node 13: 1195.8
+	Time: 3558.39122391
+hello
+Node 14: 1195.76
+	Time: 3564.66090488
+hello
+Node 15: 1198.13
+	Time: 3799.44918895
+hello
+Node 16: 1199.28
+	Time: 3812.6606009
+hello
+Node 17: 1202.87
+	Time: 3747.2568841
+hello
+Node 18: 1205.8
+	Time: 3809.51887584
+hello
+Node 19: 1204.15
+	Time: 3923.04677606
+hello
+Node 20: 1204.06
+	Time: 3934.36588192
+hello
+Node 21: 1215.38
+	Time: 3708.52297711
