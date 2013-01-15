@@ -1,0 +1,3 @@
+syntax:simulate.py GraphFile Heuristic SetSize ProbabilityAlgorithm Seed
+Heuristics: degree, centrality, greedy, and random
+ProbabilityAlgorithm: tail, linear, and sine
